@@ -20,6 +20,24 @@ router.get('/seedTest', async (req, res) => {
   }
 });
 
+router.get('/helloUser', withAuth, async (req, res) => {
+  console.log({turtle: req.turtle, session: req.session});
+  const userData = await User.findByPk(req.session.user_id);
+
+  // serialize (unpack)
+  const user = userData.get({ plain: true });
+
+  // res.send("Hello....");
+  // res.json(user);
+  res.render('hellouser', { 
+    otherData: "blahblahblah",
+    user: {
+      name: user.name,
+      email: user.email
+    }
+  });
+});
+
 router.get('/', async (req, res) => {
   try {
     // Get all projects and JOIN with user data
@@ -70,6 +88,7 @@ router.get('/project/:id', async (req, res) => {
 // Use withAuth middleware to prevent access to route
 router.get('/profile', withAuth, async (req, res) => {
   try {
+    console.log({turtle: req.turtle, session: req.session});
     // Find the logged in user based on the session ID
     const userData = await User.findByPk(req.session.user_id, {
       attributes: { exclude: ['password'] },
